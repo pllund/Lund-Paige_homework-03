@@ -1,0 +1,108 @@
+---
+title: "Lund-Paige_homework-03"
+format: 
+  html: 
+    toc: true #include table of contents in rendered html 
+execute: #all code chunks
+    warning: false #no warnings
+    message: false #no messages
+---
+
+Link  to forked repository: https://github.com/pllund/Lund-Paige_homework-03 Note: document should be committed and pushed ten times
+
+# Problem 1: Multiple Linear Regression
+
+## Setting Up
+```{r set-up}
+#load in necessary general packages
+library(tidyverse)
+library(readxl)
+library(here)
+library(janitor)
+#package for visualizing pairs
+library(GGally)
+#package for model selection
+library(MuMIn)
+#package for model predictions
+library(ggeffects)
+#package for model tables
+library(gtsummary)
+library(flextable)
+library(modelsummary)
+
+#load in drought data 
+drought_exp <- read_xlsx(path = here("data", 
+                                     "Valliere_etal_EcoApps_Data.xlsx"),
+                         sheet = "First Harvest")
+
+#look at data to check it is correct
+str(drought_exp)
+class(drought_exp)
+```
+## Data Cleaning
+```{r cleaning}
+#clean the drought_exp data
+drought_exp_clean <- drought_exp %>% 
+  #set nicer column names
+  clean_names() %>% 
+  #add column with species scientific names
+  mutate(species_name = case_when( 
+    species == "ENCCAL" ~ "Encelia californica", # bush sunflower
+    species == "ESCCAL" ~ "Eschscholzia californica", # California poppy
+    species == "PENCEN" ~ "Penstemon centranthifolius", # Scarlet bugler
+    species == "GRICAM" ~ "Grindelia camporum", # great valley gumweed
+    species == "SALLEU" ~ "Salvia leucophylla", # Purple sage
+    species == "STIPUL" ~ "Nasella pulchra", # Purple needlegrass
+    species == "LOTSCO" ~ "Acmispon glaber" # deerweed
+  )) %>% 
+  #moving species_name column after species
+  relocate(species_name, .after = species) %>% 
+  #adding column with full treatment names
+  mutate(water_treatment = case_when( 
+    water == "WW" ~ "Well watered",
+    water == "DS" ~ "Drought stressed"
+  )) %>% 
+  #moving water_treatment column after water
+  relocate(water_treatment, .after = water) 
+```
+
+## Visualizing Data
+
+### Correlations
+```{r}
+
+
+```
+
+
+# Problem 2: Affective Visualization
+
+a. Describe in words what an affective visualization could look like for your personal data (3-5 sentences). 
+
+
+
+
+# Problem 3: Statistical Critique
+
+a. Revisit and Summarize: What are the statistical tests the authors are using to address their main research question? Insert the figure or table you described in Homework 2 here.
+
+**The author used a logistic regression statistical test to answer their main research question which was identifying whether there was a relationship between tobacco outlet density near schools and individual's smoking habits. Additionally, they used a linear regression model to test the relationship between density, perceived prevalence and peer approval.**
+
+```{r}
+#load packages for importing png and set directory
+library(png)
+library(grid)
+#setwd("/Users/paigelund/desktop/es_193DS")
+#read in png
+#table <- readPNG("table.png")
+#show png
+#grid.raster(table)
+```
+
+
+
+
+
+
+
+
