@@ -1,0 +1,150 @@
+---
+title: "homework3_scratchwork"
+format: html
+---
+
+## 0. Null model
+```{r null-model0}
+model0 <- lm(total_g ~ 1, # formula
+             data = drought_exp_clean) # data frame
+```
+
+
+## 1. total biomass as a function of SLA, water treatment, and species
+```{r saturated-model1}
+# saturated model
+model1 <- lm(total_g ~ sla + water_treatment + species_name,
+             data = drought_exp_clean)
+```
+
+## 2. total biomass as a function of SLA and water treatment
+```{r simpler-model2}
+model2 <- lm(total_g ~ sla + water_treatment,
+             data = drought_exp_clean)
+```
+
+## 3. total biomass as a function of SLA and species
+```{r simpler-model3}
+model3 <- lm(total_g ~ sla + species_name,
+             data = drought_exp_clean)
+
+```
+
+## 4. MY MODEL (last one)
+```{r simpler-model4}
+model4 <- lm(total_g ~ water_treatment + species_name,
+             data = drought_exp_clean)
+
+summary(model4)
+
+par(mfrow = c(2, 2))
+plot(model4) 
+```
+
+
+
+
+```{r model-predictions-with-ggplot}
+# creating new data frame of model predictions for plotting
+model_preds_for_plotting <- model_preds %>% 
+  rename(sla = x, # renaming columns to make this easier to use
+         water_treatment = group,
+         species_name = facet)
+
+# use View(model_preds_for_plotting) 
+# to compare this to the original model_preds data frame
+
+ggplot() +
+  # underlying data
+  geom_point(data = drought_exp_clean,
+             aes(x = sla,
+                 y = total_g,
+                 color = water_treatment)) +
+  # model prediction 95% CI ribbon
+  geom_ribbon(data = model_preds_for_plotting,
+              aes(x = sla, 
+                  y = predicted,
+                  ymin = conf.low,
+                  ymax = conf.high,
+                  fill = water_treatment),
+              alpha = 0.2) +
+  # model prediction lines
+  geom_line(data = model_preds_for_plotting,
+            aes(x = sla, 
+                y = predicted,
+                color = water_treatment)) +
+  # cleaner theme
+  theme_classic() +
+  # creating different panels for species
+  facet_wrap(~species_name) 
+```
+
+
+```{r model-selection}
+library(MuMIn)
+
+model.sel(model0,
+          model1, 
+          model2, 
+          model3, 
+          model4)
+```
+
+```{r model-tables}
+# one option for a single model
+flextable::as_flextable(model4) 
+
+# another option for a single model
+gtsummary::tbl_regression(model1)
+
+# comparing models
+modelsummary::modelsummary( # this function takes a list of models
+  list( 
+    "null" = model0, # "model name" = model object
+    "model 1" = model1,
+    "model 2" = model2,
+    "model 3" = model3, 
+    "model 4" = model4
+  )
+) 
+
+
+Table: In your table, each row should be a model with the model number (1, 2, 3, etc.) and the predictors for each model.
+```
+
+
+b. Write a 5-6 sentence “statistical methods” section. (8 points)
+Your answer should be in paragraph form and include:
+
+how you addressed the central question(s) (i.e. to examine the influence of ____, ____, and ____ on _____, I…)
+
+I ran 5 different statistical models (null, etc) and compared using AIc and delta thing to identify best model, used multiple lin reg model, categorical var, 
+
+how you chose the final model (i.e. to determine the model that best described ____, I…)
+
+AIc and delta 
+
+how you visually determined that your final model conformed to the assumptions of a linear model (i.e. to evaluate linear model assumptions, I…)
+
+see outputs
+par(mfrow = c(2, 2))
+plot(model4)  
+
+
+
+
+
+
+
+last part cite  p-value: < 2.2e-16 and Adjusted R-squared:  0.7257 and the AIC/delta
+
+
+
+education psychology 
+
+
+
+
+
+
+

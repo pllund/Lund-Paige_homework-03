@@ -89,7 +89,7 @@ a. Revisit and Summarize: What are the statistical tests the authors are using t
 **The author used a logistic regression statistical test to answer their main research question which was identifying whether there was a relationship between tobacco outlet density near schools and individual's smoking habits. Additionally, they used a linear regression model to test the relationship between density, perceived prevalence and peer approval.**
 
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 #load in necessary packages
 library(png)
 library(grid)
@@ -100,16 +100,13 @@ grid.raster(table_pic)
 
 b. Visual Clarity: How clearly did the authors visually represent their statistics in figures? For example, are the x- and y-axes in a logical position? Do they show summary statistics (means and SE, for example) and/or model predictions, and if so, do they show the underlying data?
 
-**The authors did not include any figures to represent their statistics, they chose to only include tables. This in itself made it more difficult to understand their main findings as there were multiple tables and it was a challenging process to interpret them given their complexity. As for the table I included above (Table 5), since there are no x and y axes, the column and row titles were assessed and their positions appear to be logically placed, despite the double layer of column names which makes things slightly more confusing. They do not show all summary statistics, although they table itself is comprised of coefficients and confidence intervals. They do not show any additional underlying data.**
+**The authors did not include any figures to represent their statistics, they chose to only include tables. This in itself made it more difficult to understand their main findings as there were multiple tables and it was a challenging process to interpret them given their complexity. As for the table I included above (Table 5), since there are no x and y axes, the column and row titles were assessed and their positions appear to be logically placed, despite the double layer of column names which makes things slightly more confusing. They do not show all summary statistics because the table is meant to show results from the three regression models, although the table itself is comprised of coefficients and confidence intervals. They do not show any additional underlying data.**
 
 c. Aesthetic Clarity: How well did the authors handle “visual clutter”? How would you describe the the data:ink ratio?
 
-**The **
+**Although the table itself is very dense (it is like a wall of numbers) there is not necessarily any visual clutter given that there is no unnecessary data included nor are there any unnecessary labels. The data:ink ratio can be described as high given that there is no non-data ink anywhere in the table. The only ink used is black and none of it is used for any background graphics, just solely for the purpose of displaying the necessary information which allows the reader to just focus on the information and no other elements.**
 
 
+d. Recommendations: What recommendations would you make to make the figure better? What would you take out, add, or change? Provide explanations/justifications for each of your recommendations. Alternatively, if they did not represent their statistics in a figure, what kind of figure would you recommend to them? Describe the x- and y-axes, with any geometries and aesthetics (colors, etc.). Provide enough explanation such that someone would be able to create the figure you describe in code. Provide explanations/justifications for the figure you would recommend.
 
-
-
-
-
-
+**Given that the authors chose to represent their statistics in a table, I would recommend a forest plot to display their results. For this figure, the x-axis would be labeled "Estimates" and would denote the coefficient values from the table. The y-axis would be labeled "Predictors" and would list all of the specific predictors (i.e. age, gender (male), race, etc...). For the forest plot, the dot for each predictor would represent their coefficient and the bar attached to each individual dot would represent the corresponding confidence interval. In order to define which predictors from from which category (i.e. teen characteristics, peer/parent/household, and home neighborhood) the clusters of predictors would be colored differently. So, all of the predictors under the teen characteristics predictor category would be blue, and the next group would be red, and so on. Lastly, there would be a solid black horizontal line at 0 on the x-axis to identify cases in which the confidence interval captures zero for a given predictor. I would choose to use a forest plot because it does not require a standardized numerical y-axis which would be very difficult to do for this type of data.**

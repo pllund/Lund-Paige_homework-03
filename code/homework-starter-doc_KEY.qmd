@@ -189,6 +189,8 @@ model0 <- lm(total_g ~ 1, # formula
 model1 <- lm(total_g ~ sla + water_treatment + species_name,
              data = drought_exp_clean)
 
+summary(model1)
+
 par(mfrow = c(2, 2))
 plot(model1)
 # you might get a warning when you run this code - that is ok!
@@ -326,6 +328,8 @@ ggplot() +
 # Making a table
 
 ```{r model-tables}
+library(modelsummary)
+
 # one option for a single model
 flextable::as_flextable(model1) 
 
