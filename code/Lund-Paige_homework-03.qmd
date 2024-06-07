@@ -15,8 +15,7 @@ execute: #all code chunks
 
 Link  to forked repository: https://github.com/pllund/Lund-Paige_homework-03 
 
-Link to html file: 
-
+(note that my html file is within the code folder of the repo and is titled Lund-Paige_homework-03.html)
 
 # Problem 1: Multiple Linear Regression
 
