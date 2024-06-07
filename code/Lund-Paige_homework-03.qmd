@@ -11,15 +11,6 @@ execute: #all code chunks
 
 Link  to forked repository: https://github.com/pllund/Lund-Paige_homework-03 
 
-Note: document should be committed and pushed ten times
-
-QUESTIONS:
-Is the way my table is with the title okay.. cannot get it to be on top!
-
-For visualization, why is it not coming up the same way as in the homework.. am i putting in the wrong things?
-
-should model results come from output of summary function?
-
 
 # Problem 1: Multiple Linear Regression
 
@@ -44,11 +35,8 @@ library(modelsummary)
 #load in drought data 
 drought_exp <- read_xlsx(path = here("data", 
                                      "Valliere_etal_EcoApps_Data.xlsx"),
+                         #select specific sheet of data that I want to use 
                          sheet = "First Harvest")
-
-#look at data to check it is correct
-#str(drought_exp)
-#class(drought_exp)
 ```
 
 
@@ -59,13 +47,13 @@ drought_exp_clean <- drought_exp %>%
   clean_names() %>% 
   #add column with species scientific names
   mutate(species_name = case_when( 
-    species == "ENCCAL" ~ "Encelia californica", # bush sunflower
-    species == "ESCCAL" ~ "Eschscholzia californica", # California poppy
-    species == "PENCEN" ~ "Penstemon centranthifolius", # Scarlet bugler
-    species == "GRICAM" ~ "Grindelia camporum", # great valley gumweed
-    species == "SALLEU" ~ "Salvia leucophylla", # Purple sage
-    species == "STIPUL" ~ "Nasella pulchra", # Purple needlegrass
-    species == "LOTSCO" ~ "Acmispon glaber" # deerweed
+    species == "ENCCAL" ~ "Encelia californica", #Bush sunflower
+    species == "ESCCAL" ~ "Eschscholzia californica", #California poppy
+    species == "PENCEN" ~ "Penstemon centranthifolius", #Scarlet bugler
+    species == "GRICAM" ~ "Grindelia camporum", #Great valley gumweed
+    species == "SALLEU" ~ "Salvia leucophylla", #Purple sage
+    species == "STIPUL" ~ "Nasella pulchra", #Purple needlegrass
+    species == "LOTSCO" ~ "Acmispon glaber" #deerweed
   )) %>% 
   #moving species_name column after species
   relocate(species_name, .after = species) %>% 
@@ -79,7 +67,7 @@ drought_exp_clean <- drought_exp %>%
 ```
 
 ```{r}
-#running all models in order to prep for model.sel 
+#run all models in order to prep for model.sel function 
 
 #null model
 model0 <- lm(total_g ~ 1, # formula
@@ -93,7 +81,7 @@ model2 <- lm(total_g ~ sla + water_treatment,
 #simpler model
 model3 <- lm(total_g ~ sla + species_name,
              data = drought_exp_clean)
-#my model I created 
+#my model I created!
 model4 <- lm(total_g ~ water_treatment + species_name,
              data = drought_exp_clean)
 ```
@@ -105,13 +93,15 @@ library(MuMIn)
 library(knitr)
 library(kableExtra)
 
-#create model selection table to see all of the models compared to one another and identify model4 as the best option
+#create model selection table to see all of the models compared to one another
+#based on this output we find that model4 is the best option
 model.sel(model0, model1, model2, model3, model4)
 
 #visually confirm that model4 is the best by checking that it conforms to the assumptions of a linear model
 par(mfrow = c(2, 2))
 plot(model4)
 
+#now work towards creating the table of all model results!
 #table of data calling all models from above
 select_models <- model.sel(model0, model1, model2, model3, model4)
 
@@ -120,95 +110,88 @@ select_models_df <- as.data.frame(select_models)
 
 #add and update the 'sla' column with specific values
 select_models_df$sla <- c(NA, -0.0002475, 0.0012900, 0.0012807, NA)
-# Assuming you want to keep the last set of values for 'sla', update it again
+#change to what I want the values to be
 select_models_df$sla <- c(NA, "+", "+", "+", NA)
 
-#select specific columns
+#select specific columns of interest that I need to show in table
 select_columns <- select_models_df[, c("sla", "species_name", "water_treatment", "AICc", "delta")]
 
-#rename columns
+#rename column titles
 colnames(select_columns) <- c("SLA", "Species Name", "Water Treatment", "AIC", "Delta AIC")
 
 #create and print the table with caption
 #note that I went to drop-in hours and asked An and she did not know why the title still was on the bottom of the table when I rendered the document and she said that it was fine to leave it like this. 
-
 kable(select_columns, 
       caption = "Table 1. Multiple Linear Regression Model Selection") |>
   kable_styling(full_width = FALSE, position = "center") |>
-  add_header_above(c(" " = 2, " " = 4))  
+  add_header_above(c(" " = 2, " " = 4))
 ```
-**Table shows models constructed for the multiple linear regression analysis. Rows denote the given model (model 0 aka null through model 4) and columns represent predictors used, AIC, and Delta AIC values. For the predictor columns, NA denotes cases where the predictor was not present for the given model, and a + symbol denotes cases where the predictor was present for the given model (i.e. for model4 the predictors were Species Name and Water Treatment. The table supports our conclusion that model4 is the best model.**
+**Description: Table 1 shows models constructed for the multiple linear regression analysis. Rows denote the given model (model 0 aka null through model 4) and columns represent predictors used, AIC, and Delta AIC values. For the predictor columns, NA denotes cases where the predictor was not present for the given model, and a + symbol denotes cases where the predictor was present for the given model (i.e. for model4 the predictors were Species Name and Water Treatment. The table supports our conclusion that model4 is the best model.**
 
 ## b. Statistical Methods
 
-**To examine the influence of SLA (specific leaf area), water treatment, and species name on total biomass. To determine the model that best described the relationship between our predictors of interest and total biomass in grams, I ran five seperate models and compared AIC and Beta AIC values. First, I ran model0 which was the null model, then I ran the saturated model (model1) with all three predictors, then I ran three more models with different unique combinations of two of the three predictors. From these results, I compared the findings using model.sel and found that model4 was the best given that it had the lowest AIC value and had a delta AIC value of zero. Lastly, in order to visually confirm these findings I used the "par" and "plot" functions to check for linear model assumptions. From our residuals v. fitted plot we saw that the residuals were homoskedastic and the line was roughly straight, for the normal Q-Q plot we saw that the line was roughly a linear straight slope showing that it is normally distributed, for the scale-location plot we saw again that the line was roughly straight and the points evenly distributed meaning that our residuals were normally distributed, and lastly, our constant leverage plot did not appear to present any significant outliers, all of which to say that model4 does conform to all assumptions of a linear model.**
-
-
-In this scenario, we're interested in how three variables affect total biomass: species (categorical), water treatment (categorical), specific leaf area (SLA, numeric)
+**To examine the influence of SLA (specific leaf area; numeric variable), water treatment (categorical variable), and species name (categorical variable) on total biomass. To determine the model that best described the relationship between our predictors of interest and total biomass in grams, I ran five seperate models (null, saturated, and three simplier models) and compared AIC and Beta AIC values. First, I ran model0 which was the null model, then I ran the saturated model (model1) with all three predictors, then I ran three more models with different unique combinations of two of the three predictors. From these results, I compared the findings using the model.sel tool and found that model4 was the best given that it had the lowest AIC value (AIC = -158.8) and had a Delta AIC value of zero. Lastly, in order to visually confirm these findings I used the "par" and "plot" functions to check for linear model assumptions. From our residuals v. fitted plot we saw that the residuals were homoskedastic (and evenly distributed) with a line that was roughly straight, for the normal Q-Q plot we saw that the line was roughly a linear straight slope showing that it is normally distributed, for the scale-location plot we saw again that the line was roughly straight and the points evenly distributed meaning that our residuals were normally distributed, and lastly, our constant leverage plot did not appear to present any significant outliers, all of which to say that model4 does conform to all assumptions of a linear model.**
 
 ## c. Model Visualization
-
 ```{r}
-# trying it again!]
+#prepping for making visualization using ggpredict
 model4_preds <- ggpredict(model4, 
+                          #calling the predictors we want from model4
                          terms = c("water_treatment", 
                                    "species_name"))
 
-
-# creating new data frame of model predictions for plotting
-model4_preds_for_plotting <- model4_preds %>% 
-  rename(water_treatment = x, # renaming columns to make this easier to use
+#make new data frame of model predictions for plotting
+model4_preds_for_plotting <- model4_preds |>
+  #rename columns 
+  rename(water_treatment = x, 
          species_name = group) 
 
-# use View(model_preds_for_plotting) 
-# to compare this to the original model_preds data frame
-
+#plot the data! 
 ggplot() +
-  # underlying data
+  #select the underlying data and set aesthetics
   geom_point(data = drought_exp_clean,
              aes(x = water_treatment,
                  y = total_g,
                  color = water_treatment), 
-             show.legend = FALSE) +
-  # model prediction 95% CI ribbon
-  geom_ribbon(data = model4_preds_for_plotting,
-              aes(x = water_treatment, 
-                  y = predicted,
-                  ymin = conf.low,
-                  ymax = conf.high,
-                  fill = water_treatment),
-              alpha = 0.2, 
-              show.legend = FALSE) +
-  # model prediction lines
-  geom_line(data = model4_preds_for_plotting,
-            aes(x = water_treatment, 
-                y = predicted,
-                color = water_treatment), 
-            show.legend = FALSE) + 
-  labs(x = "Water Treatment", y = "Total Biomass (g)", caption = "") + 
-  # cleaner theme
-  theme_classic() + 
-  theme(axis.text = element_text(size = 7)) + 
-  # creating different panels for species
+             #make these points more transparent
+             alpha = 0.2, 
+             #get rid of the figure legend
+             show.legend = FALSE) + 
+  #add in the data from ggpredict to show predicted value and confidence interval
+  geom_pointrange(data = model4_preds_for_plotting, 
+                  #set aesthetics to call data I want and set min and max for y 
+                aes(x = water_treatment, y = predicted, 
+                    ymin = conf.low, ymax = conf.high, 
+                    color = water_treatment), 
+                #adjust the width of the figure 
+                width = 0.2, size = 0.5, 
+                #get rid of the legend on the side 
+                show.legend = FALSE) +
+  #add facets by species name!
   facet_wrap(~species_name) + 
+  #change the colors of the plot manually 
   scale_color_manual(values = c("Well watered" = "skyblue", 
                                 "Drought stressed" = "yellow3")) + 
+  #change the colors of the plot manually
   scale_fill_manual(values = c("Well watered" = "skyblue", 
-                                "Drought stressed" = "yellow3"))
+                                "Drought stressed" = "yellow3")) + 
+  #set new labels for the axis titles 
+  labs(x = "Water Treatment", y = "Total Biomass (g)", caption = "") + 
+  #make the theme more clean 
+  theme_classic()
 ```
-
-
 
 ## d. Visualization Caption
-```{r}
 
-
-
-```
+**Figure 1. Model 4 Regression Results. Figure shows results of regression model for the selected predictors of water treatment and species name. Figure shows the water total biomass in grams for each individual plant species and corresponding values based on water treatment predictor categories. Data sourced from: A. Bui, ENVS193DS-workshop-08, (2024), GitHubg repository, https://github.com/an-bui/ENVS193DS_workshop-08**
 
 ## e. Results
+```{r}
+#get summary stats for model 4
+summary(model4)
+```
 
-**The predictors that best described total mass were species name and water treatment (aka model4) according to the outputs from our model.sel analysis (INSERT MODEL4 SUMMARY STATS HERE). On average, we see that there is a difference between water treatments, specifically that well watered leaves have greater total mass in grams than those which are drought stressed. On average, we see that there are difference among different species and their total mass, seeing that Grindelia camporum had the highest total mass in grams as opposed to Acmispon glaber which had the lowest total mass across both water treatments.**
+**The predictors that best described total mass were species name and water treatment (aka model4) according to the outputs from our model.sel analysis. We found that water treatement and species predicted total biomass (table 1) and results were supported by our summary statistics (linear regression, F(62, 7) = 27.08, p < 0.0001, alpha = 0.05, R^2^ = 0.7535). On average, total biomass was the highest for water treatment being well watered (model prediction: 0.48484286, CI: 0.435838082 ,0.5338476), while total biomass was lowest for drought stressed cases (model prediction: 0.05454714, CI: 0.02451499, 0.005542367). On average, we see that there is a difference between water treatments, specifically that well watered leaves have greater total mass in grams than those which are drought stressed. On average, we see that there are difference among different species and their total mass, seeing that Grindelia camporum had the highest total mass in grams as opposed to Acmispon glaber which had the lowest total mass across both water treatments.**
 
 # Problem 2: Affective Visualization
 
@@ -218,7 +201,6 @@ Describe in words what an affective visualization could look like for your perso
 **I was really inspired by the data visualization paintings done by Jill Pelto, and I wanted to expand upon this method of affective visualization through my data collected regarding time it has taken me to cook different meals compared to the number of total ingredients used. In order to incorporate the affective aspect of the three vertices discussed in lecture, I would like to create a figure that connects the points of my scatterplot through overlaid sketches related to cooking in order to tie in the message of my plot with the actual data that I have collected. In this way, my data could be conveyed in a way that not only shows the raw outcomes, but additionally expresses a sense of creativity and cohesion for the data.**
 
 ## b. Sketch of Idea
-
 ```{r}
 #load in necessary packages
 library(png)
