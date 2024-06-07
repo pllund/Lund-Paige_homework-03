@@ -9,7 +9,17 @@ execute: #all code chunks
     message: false #no messages
 ---
 
-Link  to forked repository: https://github.com/pllund/Lund-Paige_homework-03 Note: document should be committed and pushed ten times
+Link  to forked repository: https://github.com/pllund/Lund-Paige_homework-03 
+
+Note: document should be committed and pushed ten times
+
+QUESTIONS:
+Is the way my table is with the title okay.. cannot get it to be on top!
+
+For visualization, why is it not coming up the same way as in the homework.. am i putting in the wrong things?
+
+should model results come from output of summary function?
+
 
 # Problem 1: Multiple Linear Regression
 
@@ -37,8 +47,8 @@ drought_exp <- read_xlsx(path = here("data",
                          sheet = "First Harvest")
 
 #look at data to check it is correct
-str(drought_exp)
-class(drought_exp)
+#str(drought_exp)
+#class(drought_exp)
 ```
 
 
@@ -120,7 +130,7 @@ select_columns <- select_models_df[, c("sla", "species_name", "water_treatment",
 colnames(select_columns) <- c("SLA", "Species Name", "Water Treatment", "AIC", "Delta AIC")
 
 #create and print the table with caption
-#kable(select_columns, title = "Table 1. Multiple Linear Regression Model Selection")
+#note that I went to drop-in hours and asked An and she did not know why the title still was on the bottom of the table when I rendered the document and she said that it was fine to leave it like this. 
 
 kable(select_columns, 
       caption = "Table 1. Multiple Linear Regression Model Selection") |>
@@ -142,7 +152,6 @@ In this scenario, we're interested in how three variables affect total biomass: 
 model_visual_prep <- ggpredict(model4, 
                          terms = c("water_treatment", 
                                    "species_name"))
-
 
 # creating new data frame of model predictions for plotting
 model4_plotting <- model_visual_prep %>% 
@@ -177,8 +186,6 @@ ggplot() +
   # creating different panels for species
   facet_wrap(~species_name)
 
-
-
 model_preds <- ggpredict(model4, 
                          terms = c("species_name", 
                                    "water_treatment"))
@@ -191,8 +198,68 @@ plot(model_preds, # model predictions
   theme_classic() + # classic theme
   labs(title = "Preliminary model visualization") + # plot title
   theme(panel.grid = element_blank(), 
+        axis.text = element_text(size = 4))
+
+
+
+# plot function within ggeffects
+plot(model_preds, # model predictions
+     limit_range = TRUE, # limit the range of predictions to the range of predictor values
+     show_data = TRUE) + # show the underlying data
+  # everything below this is ggplot() stuff
+  theme_classic() + # classic theme
+  labs(title = "Preliminary model visualization") + # plot title
+  theme(panel.grid = element_blank(), 
         axis.text = element_text(size = 4)) 
+
+
 ```
+
+
+
+```{r}
+# trying it again!]
+
+model4_preds <- ggpredict(model4, 
+                         terms = c("water_treatment", 
+                                   "species_name"))
+
+
+# creating new data frame of model predictions for plotting
+model4_preds_for_plotting <- model4_preds %>% 
+  rename(water_treatment = x, # renaming columns to make this easier to use
+         species_name = group) 
+
+# use View(model_preds_for_plotting) 
+# to compare this to the original model_preds data frame
+
+ggplot() +
+  # underlying data
+  geom_point(data = drought_exp_clean,
+             aes(x = water_treatment,
+                 y = total_g,
+                 color = water_treatment)) +
+  # model prediction 95% CI ribbon
+  geom_ribbon(data = model4_preds_for_plotting,
+              aes(x = water_treatment, 
+                  y = predicted,
+                  ymin = conf.low,
+                  ymax = conf.high,
+                  fill = water_treatment),
+              alpha = 0.2) +
+  # model prediction lines
+  geom_line(data = model4_preds_for_plotting,
+            aes(x = water_treatment, 
+                y = predicted,
+                color = water_treatment)) +
+  # cleaner theme
+  theme_classic() + 
+  theme(axis.text = element_text(size = 7)) + 
+  # creating different panels for species
+  facet_wrap(~species_name) 
+```
+
+
 
 ## d. Visualization Caption
 ```{r}
