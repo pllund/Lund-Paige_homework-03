@@ -9,7 +9,13 @@ execute: #all code chunks
     message: false #no messages
 ---
 
+**Name: Paige Lund**
+
+**Date: 06-07-2024**
+
 Link  to forked repository: https://github.com/pllund/Lund-Paige_homework-03 
+
+Link to html file: 
 
 
 # Problem 1: Multiple Linear Regression
